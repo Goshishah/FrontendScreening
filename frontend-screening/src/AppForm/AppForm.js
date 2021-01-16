@@ -18,7 +18,18 @@ const AppForm = () => {
     setForm(form);
   }, []);
 
-  console.log("form........", form, Object.keys(form));
+  const handleChange = (event, element, group) => {
+    const { name, value } = event.target;
+    console.log("on change.......", group, element);
+    const updatedGroup = form[group].map((item) => {
+      if (item.id === name) {
+        return { ...item, value };
+      }
+      return item;
+    });
+    setForm({ ...form, [group]: updatedGroup });
+  };
+
   return (
     <form className="app-form">
       {Object.keys(form).map((key) => {
@@ -26,7 +37,13 @@ const AppForm = () => {
           <section className="form-section">
             <div className="section-heading">{key}</div>
             {form[key].map((element) => {
-              return <FormFields element={element} />;
+              return (
+                <FormFields
+                  group={key}
+                  element={element}
+                  onChange={handleChange}
+                />
+              );
             })}
           </section>
         );
@@ -35,14 +52,19 @@ const AppForm = () => {
   );
 };
 
-const FormFields = ({ element }) => {
+const FormFields = ({ group, element, onChange }) => {
   const { type } = element;
-  console.log("type,,,,,,,,,", type, element);
   const fields = {
-    checkbox: <AppCheckBox element={element} />,
-    select: <AppSelect element={element} />,
+    checkbox: (
+      <AppCheckBox element={element} group={group} onChange={onChange} />
+    ),
+    select: <AppSelect element={element} group={group} onChange={onChange} />,
   };
-  return fields[type] || <AppInput element={element} />;
+  return (
+    fields[type] || (
+      <AppInput element={element} group={group} onChange={onChange} />
+    )
+  );
 };
 
 export default AppForm;
